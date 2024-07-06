@@ -59,5 +59,10 @@ public class PersonController {
         return personService.getOldesPersonByCity();
     }
 
+    @GetMapping("/getPopulationByCity")
+    private List<Document> getPopulationByCity(){
+        return personService.getPopulationByCity();
+    }
+
 
 }
