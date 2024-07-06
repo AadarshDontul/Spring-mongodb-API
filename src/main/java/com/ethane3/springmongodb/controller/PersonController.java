@@ -2,6 +2,7 @@ package com.ethane3.springmongodb.controller;
 
 import com.ethane3.springmongodb.collection.Person;
 import com.ethane3.springmongodb.service.PersonService;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,10 +47,16 @@ public class PersonController {
             @RequestParam(required = false) String city,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "5") Integer size
-    ){
+    )
+    {
         Pageable pageable = PageRequest.of(page,size);
         return personService.search(name,minAge,maxAge,city,pageable);
 
+    }
+
+    @GetMapping("/oldestPerson")
+    private List<Document> getOldestPerson(){
+        return personService.getOldesPersonByCity();
     }
 
 

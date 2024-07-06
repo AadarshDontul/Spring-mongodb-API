@@ -2,10 +2,16 @@ package com.ethane3.springmongodb.service;
 
 import com.ethane3.springmongodb.collection.Person;
 import com.ethane3.springmongodb.repository.PersonRepository;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.GroupOperation;
+import org.springframework.data.mongodb.core.aggregation.SortOperation;
+import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -74,6 +80,23 @@ public class PersonServiceImpl implements PersonService{
 
         return people;
 
+    }
+
+    @Override
+    public List<Document> getOldesPersonByCity() {
+
+        UnwindOperation unwindOperation
+                = Aggregation.unwind("address");
+        SortOperation sortOperation
+                = Aggregation.sort(Sort.Direction.DESC,"age");
+        GroupOperation groupOperation
+                = Aggregation.group("address.city")
+                .first(Aggregation.ROOT)
+                .as("asOldestPerson");
+        Aggregation aggregation
+                = Aggregation.newAggregation(unwindOperation,sortOperation,groupOperation);
+
+        return mongoTemplate.aggregate(aggregation,Person.class,Document.class).getMappedResults();
     }
 
 
